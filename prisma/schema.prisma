@@ -1,0 +1,216 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["driverAdapters"]
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  role          String    @default("business") // "admin", "business", "user"
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  accounts      Account[]
+  sessions      Session[]
+  business      Business?
+  invoices      Invoice[] @relation("IssuedBy")
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+model Category {
+  id          String     @id @default(cuid())
+  name        String     @unique
+  slug        String     @unique
+  icon        String     @default("Building2")
+  description String?
+  businesses  Business[]
+  createdAt   DateTime   @default(now())
+}
+
+model Business {
+  id          String   @id @default(cuid())
+  userId      String   @unique
+  user        User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  categoryId  String?
+  category    Category? @relation(fields: [categoryId], references: [id])
+
+  name        String
+  slug        String   @unique
+  description String?
+  tagline     String?
+
+  // Contact
+  email       String?
+  phone       String?
+  website     String?
+  whatsapp    String?
+
+  // Location
+  address     String?
+  town        String?
+  island      String   @default("Fuerteventura")
+  postcode    String?
+  latitude    Float?
+  longitude   Float?
+
+  // Media
+  logo        String?
+  coverImage  String?
+  images      String?  // JSON array of image URLs
+  menuPdf     String?  // URL to uploaded PDF menu
+  menuItems   String?  // JSON: [{section, items:[{name,description,price}]}]
+
+  // Status & Plan
+  status      String   @default("pending") // pending, active, suspended
+  plan        String   @default("free") // free, starter, pro, premium
+  planExpiry  DateTime?
+  featured    Boolean  @default(false)
+  verified    Boolean  @default(false)
+
+  // Social
+  facebook    String?
+  instagram   String?
+  twitter     String?
+
+  // Hours (JSON)
+  openingHours String?
+
+  // SEO
+  metaTitle   String?
+  metaDesc    String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  contacts    Contact[]
+  invoices    Invoice[]
+  reviews     Review[]
+}
+
+model Contact {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  name        String
+  email       String?
+  phone       String?
+  subject     String?
+  message     String
+  status      String   @default("new") // new, read, replied, closed
+  notes       String?
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Review {
+  id          String   @id @default(cuid())
+  businessId  String
+  business    Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+
+  authorName  String
+  authorEmail String?
+  rating      Int      // 1-5
+  title       String?
+  body        String
+  status      String   @default("pending") // pending, approved, rejected
+
+  createdAt   DateTime @default(now())
+}
+
+model Invoice {
+  id            String   @id @default(cuid())
+  invoiceNumber String   @unique
+  businessId    String
+  business      Business @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  issuedById    String?
+  issuedBy      User?    @relation("IssuedBy", fields: [issuedById], references: [id])
+
+  status      String   @default("draft") // draft, sent, paid, overdue, cancelled
+
+  // Dates
+  issueDate   DateTime @default(now())
+  dueDate     DateTime
+  paidDate    DateTime?
+
+  // Amounts (in cents to avoid floats)
+  subtotal    Int      @default(0)
+  taxRate     Int      @default(21) // IGIC rate %
+  taxAmount   Int      @default(0)
+  total       Int      @default(0)
+
+  currency    String   @default("EUR")
+  notes       String?
+
+  items       InvoiceItem[]
+
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model InvoiceItem {
+  id          String   @id @default(cuid())
+  invoiceId   String
+  invoice     Invoice  @relation(fields: [invoiceId], references: [id], onDelete: Cascade)
+
+  description String
+  quantity    Int      @default(1)
+  unitPrice   Int      // in cents
+  amount      Int      // quantity * unitPrice
+}
+
+model Plan {
+  id          String   @id @default(cuid())
+  name        String   @unique
+  slug        String   @unique
+  price       Int      // monthly price in cents
+  yearlyPrice Int?
+  features    String   // JSON array of feature strings
+  maxImages   Int      @default(3)
+  maxContacts Int      @default(-1) // -1 = unlimited
+  featured    Boolean  @default(false)
+  active      Boolean  @default(true)
+  sortOrder   Int      @default(0)
+  createdAt   DateTime @default(now())
+}
