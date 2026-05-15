@@ -178,7 +178,7 @@ export default async function AdminBusinessEdit({ params }: { params: Promise<{ 
           <CardHeader><CardTitle className="text-base">Recent Contacts ({business.contacts.length})</CardTitle></CardHeader>
           <CardContent>
             <div className="space-y-2">
-              {business.contacts.map(c => (
+              {business.contacts.map((c: { id: string; name: string; email: string | null; message: string; status: string }) => (
                 <div key={c.id} className="flex items-center justify-between text-sm border-b pb-2 last:border-0">
                   <div>
                     <span className="font-medium">{c.name}</span>
