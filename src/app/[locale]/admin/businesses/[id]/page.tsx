@@ -96,7 +96,7 @@ export default async function AdminBusinessEdit({ params }: { params: Promise<{ 
               <Label>Category</Label>
               <select name="categoryId" defaultValue={business.categoryId ?? ""} className="mt-1 w-full border rounded-lg px-3 py-2 text-sm">
                 <option value="">None</option>
-                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+                {categories.map((c: { id: string; name: string }) => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
             <div className="flex gap-4 items-end">
