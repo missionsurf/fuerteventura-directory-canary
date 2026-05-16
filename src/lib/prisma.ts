@@ -3,15 +3,23 @@ import { PrismaLibSql } from "@prisma/adapter-libsql"
 
 function createPrismaClient() {
   const rawUrl = process.env.DATABASE_URL ?? "file:./prisma/dev.db"
-  // For remote Turso/libsql URLs, convert libsql:// -> https:// so the adapter
-  // uses HTTP mode — works reliably in serverless environments (Vercel, etc.)
+
+  // Convert libsql:// → https:// for HTTP transport (avoids WebSocket issues in serverless)
   const url = rawUrl.startsWith("libsql://")
     ? rawUrl.replace("libsql://", "https://")
     : rawUrl
+
+  const authToken = process.env.TURSO_AUTH_TOKEN
+
+  // PrismaLibSql takes a config object and creates the @libsql/client internally.
+  // Because @prisma/adapter-libsql is in serverExternalPackages, it is loaded as a
+  // CJS Node.js external (require), which correctly picks up lib-cjs/node.js from
+  // @libsql/client — avoiding the browser/edge-light web.js bundle.
   const adapter = new PrismaLibSql({
     url,
-    ...(process.env.TURSO_AUTH_TOKEN && { authToken: process.env.TURSO_AUTH_TOKEN }),
+    ...(authToken && { authToken }),
   })
+
   return new PrismaClient({ adapter })
 }
 
