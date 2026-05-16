@@ -2,7 +2,7 @@ import { PrismaClient } from "@prisma/client"
 import { PrismaLibSql } from "@prisma/adapter-libsql"
 
 function createPrismaClient() {
-  const rawUrl = process.env.DATABASE_URL ?? "file:./prisma/dev.db"
+  const rawUrl = (process.env.DATABASE_URL ?? "file:./prisma/dev.db").trim()
 
   // Convert libsql:// → https:// for HTTP transport (avoids WebSocket issues in serverless)
   const url = rawUrl.startsWith("libsql://")
