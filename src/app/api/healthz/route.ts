@@ -1,22 +1,29 @@
 import { NextResponse } from "next/server"
-import { PrismaClient } from "@prisma/client"
-import { PrismaLibSql } from "@prisma/adapter-libsql"
 
 export async function GET() {
   const dbUrl = process.env.DATABASE_URL ?? "NOT_SET"
-  const hasToken = !!process.env.TURSO_AUTH_TOKEN
-  const tokenLen = process.env.TURSO_AUTH_TOKEN?.length ?? 0
+  const token = process.env.TURSO_AUTH_TOKEN ?? ""
 
+  // Test 1: raw libsql client
   try {
-    const adapter = new PrismaLibSql({
-      url: dbUrl,
-      ...(process.env.TURSO_AUTH_TOKEN && { authToken: process.env.TURSO_AUTH_TOKEN }),
+    const { createClient } = await import("@libsql/client")
+    const client = createClient({ url: dbUrl, authToken: token })
+    const res = await client.execute("SELECT COUNT(*) as n FROM Category")
+    await client.close()
+    return NextResponse.json({
+      ok: true,
+      categories: res.rows[0],
+      dbUrlPrefix: dbUrl.slice(0, 50),
+      hasToken: !!token,
     })
-    const prisma = new PrismaClient({ adapter })
-    const count = await prisma.category.count()
-    await prisma.$disconnect()
-    return NextResponse.json({ ok: true, categories: count, dbUrlPrefix: dbUrl.slice(0, 40), hasToken, tokenLen })
   } catch (e: any) {
-    return NextResponse.json({ ok: false, error: e.message, dbUrlPrefix: dbUrl.slice(0, 40), hasToken, tokenLen }, { status: 500 })
+    return NextResponse.json({
+      ok: false,
+      stage: "libsql-client",
+      error: e.message,
+      dbUrlPrefix: dbUrl.slice(0, 50),
+      hasToken: !!token,
+      tokenLen: token.length,
+    }, { status: 500 })
   }
 }
