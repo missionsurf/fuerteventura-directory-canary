@@ -1,8 +1,7 @@
 import { auth } from "@/auth"
 import { prisma } from "@/lib/prisma"
+import { put, del } from "@vercel/blob"
 import { NextRequest, NextResponse } from "next/server"
-import { writeFile, unlink, mkdir } from "fs/promises"
-import path from "path"
 
 const MAX_IMAGE_BYTES = 5 * 1024 * 1024 // 5 MB
 const MAX_PDF_BYTES = 10 * 1024 * 1024  // 10 MB
@@ -37,36 +36,32 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: `File too large (max ${maxBytes / 1024 / 1024}MB)` }, { status: 400 })
   }
 
-  const bytes = await file.arrayBuffer()
-  const buffer = Buffer.from(bytes)
-
-  // Safe filename: timestamp + original extension
+  // Upload to Vercel Blob
   const ext = file.name.split(".").pop()?.toLowerCase() || (isImage ? "jpg" : "pdf")
-  const filename = `${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
-  const dir = path.join(process.cwd(), "public", "uploads", business.slug)
-  await mkdir(dir, { recursive: true })
-  await writeFile(path.join(dir, filename), buffer)
+  const filename = `${business.slug}/${Date.now()}-${Math.random().toString(36).slice(2)}.${ext}`
 
-  const url = `/uploads/${business.slug}/${filename}`
+  const blob = await put(filename, file, {
+    access: "public",
+    contentType: file.type,
+  })
 
   if (isImage) {
     const existing: string[] = business.images ? JSON.parse(business.images) : []
     await prisma.business.update({
       where: { id: business.id },
-      data: { images: JSON.stringify([...existing, url]) },
+      data: { images: JSON.stringify([...existing, blob.url]) },
     })
-    return NextResponse.json({ url, images: [...existing, url] })
+    return NextResponse.json({ url: blob.url, images: [...existing, blob.url] })
   } else {
-    // Delete old PDF if present
+    // Delete old PDF from Blob if present
     if (business.menuPdf) {
-      const oldPath = path.join(process.cwd(), "public", business.menuPdf)
-      await unlink(oldPath).catch(() => null)
+      await del(business.menuPdf).catch(() => null)
     }
     await prisma.business.update({
       where: { id: business.id },
-      data: { menuPdf: url },
+      data: { menuPdf: blob.url },
     })
-    return NextResponse.json({ url })
+    return NextResponse.json({ url: blob.url })
   }
 }
 
@@ -86,15 +81,13 @@ export async function DELETE(req: NextRequest) {
       where: { id: business.id },
       data: { images: JSON.stringify(updated) },
     })
-    const filePath = path.join(process.cwd(), "public", url)
-    await unlink(filePath).catch(() => null)
+    await del(url).catch(() => null)
     return NextResponse.json({ images: updated })
   }
 
   if (type === "menu-pdf") {
     if (business.menuPdf) {
-      const filePath = path.join(process.cwd(), "public", business.menuPdf)
-      await unlink(filePath).catch(() => null)
+      await del(business.menuPdf).catch(() => null)
     }
     await prisma.business.update({
       where: { id: business.id },
