@@ -42,13 +42,12 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
     <div>
       {/* Hero */}
       <section className="relative min-h-[560px] flex items-center justify-center overflow-hidden">
-        {/* Beach photo background */}
-        {/* Photo: Fuerteventura beach at sunset – Unsplash (free to use) */}
+        {/* Beach photo background – Roger's own photo of Fuerteventura */}
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
-          src="https://images.unsplash.com/photo-1653999904379-112dd805bfaa?w=1920&q=80&auto=format&fit=crop"
+          src="/hero-banner.jpg"
           alt="Fuerteventura beach"
-          className="absolute inset-0 w-full h-full object-cover object-center"
+          className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
           loading="eager"
         />
         {/* Dark gradient overlay for text legibility */}

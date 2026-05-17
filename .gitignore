@@ -47,3 +47,4 @@ prisma/*.db
 prisma/*.db-shm
 prisma/*.db-wal
 /public/uploads/
+public/IMG_1344.HEIC
