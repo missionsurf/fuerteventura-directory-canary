@@ -14,7 +14,6 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
-import GoatLogo from "@/components/GoatLogo"
 
 export default function Navbar() {
   const { data: session } = useSession()
@@ -29,7 +28,8 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href={p("/")} className="flex items-center gap-2 font-bold text-xl text-[#1B4F72]">
-            <GoatLogo className="h-9 w-auto" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/goat-logo.png" alt="Fuerteventura goat logo" className="h-10 w-auto" />
             <span className="hidden sm:inline">Fuerteventura</span>
             <span className="text-[#E67E22]">Directory</span>
           </Link>
