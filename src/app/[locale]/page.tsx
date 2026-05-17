@@ -41,21 +41,32 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
   return (
     <div>
       {/* Hero */}
-      <section
-        className="relative min-h-[520px] flex items-center justify-center"
-        style={{ background: "linear-gradient(135deg, #1B4F72 0%, #2980B9 60%, #154360 100%)" }}
-      >
-        <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none">
+      <section className="relative min-h-[560px] flex items-center justify-center overflow-hidden">
+        {/* Beach photo background */}
+        {/* Photo: Fuerteventura beach at sunset – Unsplash (free to use) */}
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          src="https://images.unsplash.com/photo-1653999904379-112dd805bfaa?w=1920&q=80&auto=format&fit=crop"
+          alt="Fuerteventura beach"
+          className="absolute inset-0 w-full h-full object-cover object-center"
+          loading="eager"
+        />
+        {/* Dark gradient overlay for text legibility */}
+        <div className="absolute inset-0 bg-gradient-to-b from-[#0d2d44]/70 via-[#1B4F72]/60 to-[#0d2d44]/80" />
+
+        {/* Wave divider at bottom */}
+        <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none z-10">
           <svg viewBox="0 0 1440 80" className="fill-white w-full">
             <path d="M0,32L48,37.3C96,43,192,53,288,58.7C384,64,480,64,576,58.7C672,53,768,43,864,42.7C960,43,1056,53,1152,53.3C1248,53,1344,43,1392,37.3L1440,32L1440,80L1392,80C1344,80,1248,80,1152,80C1056,80,960,80,864,80C768,80,672,80,576,80C480,80,384,80,288,80C192,80,96,80,48,80L0,80Z" />
           </svg>
         </div>
-        <div className="relative z-10 text-center px-4 py-16">
-          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight">
+
+        <div className="relative z-10 text-center px-4 py-20">
+          <h1 className="text-4xl md:text-6xl font-bold text-white mb-4 leading-tight drop-shadow-lg">
             {t("heroTitle")}<br />
-            <span className="text-[#E67E22]">{t("heroPlace")}</span>
+            <span className="text-[#F0A500]">{t("heroPlace")}</span>
           </h1>
-          <p className="text-blue-100 text-lg md:text-xl mb-8 max-w-xl mx-auto">
+          <p className="text-white/90 text-lg md:text-xl mb-8 max-w-xl mx-auto drop-shadow">
             {t("heroSubtitle")}
           </p>
           <form action={p("/directory")} method="get" className="max-w-xl mx-auto flex gap-2">
@@ -67,14 +78,14 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
                 className="pl-10 h-12 bg-white border-0 shadow-lg text-gray-900 placeholder:text-gray-400"
               />
             </div>
-            <Button type="submit" className="h-12 px-6 bg-[#E67E22] hover:bg-[#CA6F1E] text-white font-semibold">
+            <Button type="submit" className="h-12 px-6 bg-[#E67E22] hover:bg-[#CA6F1E] text-white font-semibold shadow-lg">
               {t("searchButton")}
             </Button>
           </form>
-          <div className="mt-4 flex flex-wrap justify-center gap-3">
+          <div className="mt-5 flex flex-wrap justify-center gap-3">
             {["Corralejo", "Morro Jable", "El Cotillo", "Caleta de Fuste"].map(town => (
               <Link key={town} href={`${p("/directory")}?town=${encodeURIComponent(town)}`}
-                className="text-blue-200 hover:text-white text-sm underline underline-offset-2 transition-colors">
+                className="text-white/80 hover:text-white text-sm underline underline-offset-2 transition-colors drop-shadow">
                 {town}
               </Link>
             ))}

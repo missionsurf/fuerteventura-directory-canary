@@ -2,7 +2,7 @@
 
 import Link from "next/link"
 import { useSession, signOut } from "next-auth/react"
-import { MapPin, Menu, X, Building2, ChevronDown } from "lucide-react"
+import { Menu, X, Building2, ChevronDown } from "lucide-react"
 import { useState } from "react"
 import { useTranslations, useLocale } from "next-intl"
 import { Button } from "@/components/ui/button"
@@ -14,6 +14,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import LanguageSwitcher from "@/components/LanguageSwitcher"
+import GoatLogo from "@/components/GoatLogo"
 
 export default function Navbar() {
   const { data: session } = useSession()
@@ -28,7 +29,7 @@ export default function Navbar() {
         <div className="flex items-center justify-between h-16">
           {/* Logo */}
           <Link href={p("/")} className="flex items-center gap-2 font-bold text-xl text-[#1B4F72]">
-            <MapPin className="h-6 w-6 text-[#E67E22]" />
+            <GoatLogo className="h-9 w-auto" />
             <span className="hidden sm:inline">Fuerteventura</span>
             <span className="text-[#E67E22]">Directory</span>
           </Link>
