@@ -47,11 +47,11 @@ export default async function HomePage({ params }: { params: Promise<{ locale: s
         <img
           src="/hero-banner.jpg"
           alt="Fuerteventura beach"
-          className="absolute inset-0 w-full h-full object-cover object-[center_35%]"
+          className="absolute inset-0 w-full h-full object-cover object-[center_35%] [filter:saturate(1.6)_brightness(1.08)_contrast(1.05)]"
           loading="eager"
         />
         {/* Dark gradient overlay for text legibility */}
-        <div className="absolute inset-0 bg-gradient-to-b from-[#0d2d44]/70 via-[#1B4F72]/60 to-[#0d2d44]/80" />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-[#0a3d55]/35 to-black/60" />
 
         {/* Wave divider at bottom */}
         <div className="absolute bottom-0 left-0 right-0 overflow-hidden leading-none z-10">

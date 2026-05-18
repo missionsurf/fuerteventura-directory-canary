@@ -29,7 +29,7 @@ export default function Navbar() {
           {/* Logo */}
           <Link href={p("/")} className="flex items-center gap-2 font-bold text-xl text-[#1B4F72]">
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/goat-logo.png" alt="Fuerteventura goat logo" className="h-10 w-auto" />
+            <img src="/goat-logo-transparent.png" alt="Fuerteventura goat logo" className="h-10 w-auto" />
             <span className="hidden sm:inline">Fuerteventura</span>
             <span className="text-[#E67E22]">Directory</span>
           </Link>
